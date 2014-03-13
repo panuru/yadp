@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="vendor/jquery-1.11.0.js"></script>
+    <script type="text/javascript" src="vendor/date.js"></script>
+    <script type="text/javascript" src="src/datepicker.js"></script>
+    <link rel="stylesheet" href="src/datepicker.css" type="text/css">
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+  </head>
+  <body>
+    <h1>Example</h1>
+    <section class="container">
+      <label for="datepicker">Choose date</label>
+      <input type="text" disabled id="datepicker" value="2013-11-16">
+    </section>
+    <script type="text/javascript">
+      $(function() {
+        $('#datepicker').datepicker(); // it doesn't take any options for now
+      });
+    </script>
+  </body>
+</html>
