@@ -9,11 +9,12 @@
       date = new Date();
     }
     this.date = date;
+
     // replace dom element with a datepicker control
     this.$button = $($.fn.datepicker.templates.button({ 
       value: date.toString('d MMM \'yy') 
-    }));
-    $input.replaceWith(this.$button);
+    })).insertAfter($input.hide());
+
     this.$button.click(this.toggleCalendar.bind(this));
   }
 
@@ -34,7 +35,40 @@
       }
     },
     renderCalendar: function(){
-
+      var month = this.date.getMonth();
+      var year = this.date.getFullYear();
+      for(var i = -1; i <= 1; i++) {
+        this.renderMonth(month + i, year);
+      }
+    },
+    renderMonth: function(month, year) {
+      var templates = $.fn.datepicker.templates;
+      var date = new Date(year, month, 1);
+      var $month = $(templates.month({ month: date.toString('MMMM'), year: year }));
+      var $table = $month.find('.dp-month-table')
+      var $week = $(templates.week);
+      // append empty cells before month's first day
+      for(var i = 0, day = date.getDay(); i < day; i++ ) {
+        $week.append(templates.emptyCell);
+      }
+      while(date.getMonth() === month) {
+        var day = date.getDate();
+        if(date.getDay() === 0 && day !== 1) {
+          $week.appendTo($table);
+          $week = $(templates.week);
+        }
+        $week.append(templates.day({ 
+          day: day, 
+          title: date.toString(), 
+          selected: date.isSameDay(this.date) 
+        }));
+        date.addDays(1);
+      }
+      for(var i = date.getDay(); i <= 6; i++) {
+        $week.append($.fn.datepicker.templates.emptyCell);
+      }
+      $week.appendTo($table);
+      this.$calendar.append($month);
     }
   }
 
