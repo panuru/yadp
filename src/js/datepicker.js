@@ -1,4 +1,5 @@
 (function($){
+  var templates = $.fn.datepicker.templates;
 
   function DatePicker($input, options) {
     this.$input = $input;
@@ -42,15 +43,16 @@
       }
     },
     renderMonth: function(month, year) {
-      var templates = $.fn.datepicker.templates;
       var date = new Date(year, month, 1);
       var $month = $(templates.month({ month: date.toString('MMMM'), year: year }));
       var $table = $month.find('.dp-month-table')
       var $week = $(templates.week);
+
       // append empty cells before month's first day
       for(var i = 0, day = date.getDay(); i < day; i++ ) {
         $week.append(templates.emptyCell);
       }
+
       while(date.getMonth() === month) {
         var day = date.getDate();
         if(date.getDay() === 0 && day !== 1) {
@@ -64,9 +66,12 @@
         }));
         date.addDays(1);
       }
-      for(var i = date.getDay(); i <= 6; i++) {
+
+      // append empty cells after month's last day
+      for(var i = date.addDays(-1).getDay(); i <= 6; i++) {
         $week.append($.fn.datepicker.templates.emptyCell);
       }
+
       $week.appendTo($table);
       this.$calendar.append($month);
     }

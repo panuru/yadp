@@ -1,0 +1,90 @@
+@import "compass/css3";
+$accent-color: #003AE8;
+$accent-background: #D5E7FD;
+$accent-border-color-active: #A5CBFB;
+$accent-border-color: #D0E4FC;
+
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), 
+       url('../fonts/glyphicons-halflings-regular.woff') format('woff'), 
+       url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), 
+       url('../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
+}
+/** Button **/
+.dp-control {
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0 3px;
+  padding: 4px;
+  font-size: 0.8em;
+  color: $accent-color;
+  background-color: $accent-background;
+  border: solid 1px $accent-border-color;
+  &.dp-expanded {
+    border: solid 1px $accent-border-color-active;
+  }
+}
+.dp-control:before {
+  font-family: 'Glyphicons Halflings';
+  content: "\e109";
+  position: relative;
+  font-size: 0.9em;
+  top: 0.1em;
+  padding: 0 4px;
+}
+.dp-control:after {
+  font-family: 'Glyphicons Halflings';
+  font-size: 0.6em;
+  padding: 0 6px;
+}
+.dp-expanded:after {
+  content: "\e113";
+}
+.dp-collapsed:after {
+  content: "\e114";
+}
+/** Calendar **/
+.dp-calendar-container {
+  text-align: center;
+  color: #000;
+  &:before {
+    content: '';
+    display: block;
+    @include box-shadow(inset 0 -10px 16px -16px rgba(0,0,0,0.2));
+    height: 6px;
+    border-bottom: solid 1px #eee;
+  }
+  &:after {
+    content: '';
+    display: block;
+    @include box-shadow(inset 0 16px 16px -16px rgba(0,0,0,0.2));
+    height: 16px;
+    border-top: solid 1px #eee;
+  }
+}
+.dp-month-container {
+  display: inline-block;
+  margin: 4px 8px;
+  font-size: 0.8em;
+}
+.dp-month-header {
+  font-weight: bold;
+  border-bottom: solid 1px #ccc;
+  padding: 12px 0;
+}
+.dp-month-table {
+  td, th {
+    padding: 6px;
+  }
+  th {
+    color: #ccc;
+    font-weight: normal;
+  }
+}
+.dp-selected{
+  color: $accent-color;
+  background-color: $accent-background;
+  border: solid 1px $accent-border-color;
+}
