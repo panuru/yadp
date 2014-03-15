@@ -25,13 +25,20 @@
     },
     toggleCalendar: function() {
       if (this.isExpanded()) {
-        this.$calendar.remove();
-        delete this.$calendar;
+        this.$calendar.addClass('dp-hidden');
+        // quick & dirty hack to avoid transitionend event
+        setTimeout(function(){
+          this.$calendar.remove();
+          delete this.$calendar;
+        }.bind(this), 200);
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
         this.$calendar = $($.fn.datepicker.templates.calendarContainer);
         this.renderCalendar();
-        this.$button.after(this.$calendar);
+        this.$calendar.insertAfter(this.$button);
+        setTimeout(function(){
+          this.$calendar.removeClass('dp-hidden');
+        }.bind(this), 0);
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
@@ -68,7 +75,7 @@
       }
 
       // append empty cells after month's last day
-      for(var i = date.addDays(-1).getDay(); i <= 6; i++) {
+      for(var i = date.addDays(-1).getDay() + 1; i <= 6; i++) {
         $week.append($.fn.datepicker.templates.emptyCell);
       }
 

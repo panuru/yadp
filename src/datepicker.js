@@ -1,25 +1,20 @@
-(function($){
+;(function($){
   $.fn.datepicker = function(method, options) {
     if (_.isObject(method)) { 
       options = method; method = undefined;
     }
     options = _.defaults(options, $.fn.datepicker.defaults);
+
     return this.each(function(){
       var $this = $(this);
       var dp = $this.data('datepicker');
-      if (method) {
-        if (!dp) {
-          throw new Error('Cannot call datepicker method: datepicker is not initialized.');
-        }
-        var fn = dp[method];
-        if (!_.isFunction(fn)){
-          throw new Error('Datepicker does not have a method "' + method + '".');
-        }
-        fn.call(dp, options);
-      }
-      else if (!dp){
+
+      if (!dp){
         dp = new $.fn.datepicker.DatePicker($this, options);
         $this.data('datepicker', dp);
+      }
+      if (method) {
+        dp[method].call(dp, options);
       }
     });
   }
@@ -38,7 +33,7 @@
 
     button: _.template('<span class="dp-control dp-collapsed"><%= value %></span>'),
 
-    calendarContainer: '<div class="dp-calendar-container"></div>',
+    calendarContainer: '<div class="dp-calendar-container dp-hidden"></div>',
 
     month: _.template(
       '<section class="dp-month-container">' + 
@@ -90,13 +85,20 @@
     },
     toggleCalendar: function() {
       if (this.isExpanded()) {
-        this.$calendar.remove();
-        delete this.$calendar;
+        this.$calendar.addClass('dp-hidden');
+        // quick & dirty hack to avoid transitionend event
+        setTimeout(function(){
+          this.$calendar.remove();
+          delete this.$calendar;
+        }.bind(this), 200);
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
         this.$calendar = $($.fn.datepicker.templates.calendarContainer);
         this.renderCalendar();
-        this.$button.after(this.$calendar);
+        this.$calendar.insertAfter(this.$button);
+        setTimeout(function(){
+          this.$calendar.removeClass('dp-hidden');
+        }.bind(this), 0);
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
@@ -133,7 +135,7 @@
       }
 
       // append empty cells after month's last day
-      for(var i = date.addDays(-1).getDay(); i <= 6; i++) {
+      for(var i = date.addDays(-1).getDay() + 1; i <= 6; i++) {
         $week.append($.fn.datepicker.templates.emptyCell);
       }
 

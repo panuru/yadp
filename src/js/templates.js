@@ -6,7 +6,7 @@
 
     button: _.template('<span class="dp-control dp-collapsed"><%= value %></span>'),
 
-    calendarContainer: '<div class="dp-calendar-container"></div>',
+    calendarContainer: '<div class="dp-calendar-container dp-hidden"></div>',
 
     month: _.template(
       '<section class="dp-month-container">' + 
