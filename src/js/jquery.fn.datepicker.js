@@ -20,7 +20,10 @@
   }
 
   $.fn.datepicker.defaults = { 
-    dateFormat: 'd MMM \'yy'
+    dateFormat: 'd MMM \'yy',
+    firstDayOfWeek: 1 // Monday
   };
+
+  $.fn.datepicker.daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 })(jQuery);

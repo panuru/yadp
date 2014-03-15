@@ -13,12 +13,12 @@
 
     // replace dom element with a datepicker control
     this.$button = $(templates.button({ 
-      value: date.toString('d MMM \'yy') 
+      value: date.toString(options.dateFormat) 
     })).insertAfter($input.hide());
 
     this.$button.click(this.toggleCalendar.bind(this));
 
-    this.calendar = new $.fn.datepicker.Calendar({ date: this.date });
+    this.calendar = new $.fn.datepicker.Calendar(_.extend({ date: this.date }, this.options));
   }
 
   DatePicker.prototype = {
@@ -37,7 +37,5 @@
   }
 
   $.fn.datepicker.DatePicker = DatePicker;
-  
-  $.fn.datepicker.daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 })(jQuery);
