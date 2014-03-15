@@ -7,7 +7,7 @@ module.exports = function(grunt) {
         separator: ';\n'
       },
       dist: {
-        src: ['src/js/jquery.fn.datepicker.js', 'src/js/templates.js', 'src/js/datepicker.js'],
+        src: ['src/js/jquery.fn.datepicker.js', 'src/js/templates.js', 'src/js/calendar.js', 'src/js/datepicker.js'],
         dest: 'src/datepicker.js',
       }
     },
