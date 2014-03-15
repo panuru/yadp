@@ -5,9 +5,19 @@
     this.options = options;
     this.date = options.date;
     this.months = [];
+    this._callbacks = {};
   }
 
   Calendar.prototype = {
+    trigger: function(event, data) {
+      var cb = this._callbacks[event];
+      if(cb) { cb.fire(data); }
+    },
+    on: function(event, callback) {
+      var cb = this._callbacks[event];
+      if(!cb) { cb = this._callbacks[event] = $.Callbacks()}
+      cb.add(callback);
+    },
     insertAfter: function($element){
       if(!this.$el) { this.render(); }
       this.$el.insertAfter($element);
@@ -21,12 +31,44 @@
       var year = this.date.getFullYear();
       
       this.$el = $(templates.calendarContainer);
+
+      this.$el.click(function(ev) {
+        $target = $(ev.target);
+        if($target.hasClass('dp-day')) {
+          this.trigger('date:click', new Date($target.attr('title')));
+        }
+      }.bind(this));
       
       for(var i = -1; i <= 1; i++) {
-        this.renderMonth(month + i, year);
+        this._renderMonth(month + i, year);
       }
     },
-    renderMonth: function(month, year) {
+    select: function(date) {
+      this._getCell(this.date).removeClass('dp-selected');
+      this.date = date;
+      this._getCell(this.date).addClass('dp-selected');
+    },
+    remove: function() {
+      this.months = [];
+      this.$el.addClass('dp-hidden');
+      // quick & dirty hack - use timeout to avoid transitionend event
+      setTimeout(function(){
+        this.$el.remove();
+        delete this.$el;
+      }.bind(this), 200);
+    },
+    removeMonth: function(month) {
+      month.$el.remove();
+      _.pull(this.months, month);
+    },
+    destroy: function() {
+      this.remove();
+      _.each(this._callbacks, function(callbacks) {
+        callbacks.disable();
+      });
+      this._callbacks = {};
+    },
+    _renderMonth: function(month, year) {
       var date = new Date(year, month, 1);
       var daysOfWeek = _.clone($.fn.datepicker.daysOfWeek);
       // rearrange days of week according to the first day of week setting
@@ -73,19 +115,9 @@
       this.months.push({ month: month, year: year, $el: $month });
 
     },
-    destroy: function() {
-      this.month = [];
-      this.$el.addClass('dp-hidden');
-      // quick & dirty hack - use timeout to avoid transitionend event
-      setTimeout(function(){
-        this.$el.remove();
-        delete this.$el;
-      }.bind(this), 200);
+    _getCell: function(date){
+      return this.$el.find('.dp-day[title="' + date.toDateString() + '"]');
     },
-    destroyMonth: function(month) {
-      month.$el.remove();
-      _.pull(this.months, month);
-    }
   };
 
   $.fn.datepicker.Calendar = Calendar;

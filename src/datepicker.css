@@ -120,19 +120,20 @@
 /* line 94, stylesheets/datepicker.scss */
 .dp-month-table td, .dp-month-table th {
   padding: 7px 10px;
+  border: solid 1px transparent;
 }
-/* line 97, stylesheets/datepicker.scss */
+/* line 98, stylesheets/datepicker.scss */
 .dp-month-table th {
   color: #ccc;
   font-weight: lighter;
   font-size: 0.9em;
 }
 
-/* line 103, stylesheets/datepicker.scss */
+/* line 104, stylesheets/datepicker.scss */
 .dp-day {
   cursor: pointer;
 }
-/* line 105, stylesheets/datepicker.scss */
+/* line 106, stylesheets/datepicker.scss */
 .dp-day.dp-selected {
   color: #003ae8;
   background-color: #d5e7fd;
@@ -141,8 +142,8 @@
   -moz-transition-property: all;
   -o-transition-property: all;
   transition-property: all;
-  -webkit-transition-duration: 0.2s;
-  -moz-transition-duration: 0.2s;
-  -o-transition-duration: 0.2s;
-  transition-duration: 0.2s;
+  -webkit-transition-duration: 0.6s;
+  -moz-transition-duration: 0.6s;
+  -o-transition-duration: 0.6s;
+  transition-duration: 0.6s;
 }

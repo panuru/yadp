@@ -66,9 +66,19 @@
     this.options = options;
     this.date = options.date;
     this.months = [];
+    this._callbacks = {};
   }
 
   Calendar.prototype = {
+    trigger: function(event, data) {
+      var cb = this._callbacks[event];
+      if(cb) { cb.fire(data); }
+    },
+    on: function(event, callback) {
+      var cb = this._callbacks[event];
+      if(!cb) { cb = this._callbacks[event] = $.Callbacks()}
+      cb.add(callback);
+    },
     insertAfter: function($element){
       if(!this.$el) { this.render(); }
       this.$el.insertAfter($element);
@@ -82,14 +92,47 @@
       var year = this.date.getFullYear();
       
       this.$el = $(templates.calendarContainer);
+
+      this.$el.click(function(ev) {
+        $target = $(ev.target);
+        if($target.hasClass('dp-day')) {
+          this.trigger('date:click', new Date($target.attr('title')));
+        }
+      }.bind(this));
       
       for(var i = -1; i <= 1; i++) {
-        this.renderMonth(month + i, year);
+        this._renderMonth(month + i, year);
       }
     },
-    renderMonth: function(month, year) {
+    select: function(date) {
+      this._getCell(this.date).removeClass('dp-selected');
+      this.date = date;
+      this._getCell(this.date).addClass('dp-selected');
+    },
+    remove: function() {
+      this.months = [];
+      this.$el.addClass('dp-hidden');
+      // quick & dirty hack - use timeout to avoid transitionend event
+      setTimeout(function(){
+        this.$el.remove();
+        delete this.$el;
+      }.bind(this), 200);
+    },
+    removeMonth: function(month) {
+      month.$el.remove();
+      _.pull(this.months, month);
+    },
+    destroy: function() {
+      this.remove();
+      _.each(this._callbacks, function(callbacks) {
+        callbacks.disable();
+      });
+      this._callbacks = {};
+    },
+    _renderMonth: function(month, year) {
       var date = new Date(year, month, 1);
       var daysOfWeek = _.clone($.fn.datepicker.daysOfWeek);
+      // rearrange days of week according to the first day of week setting
       _(this.options.firstDayOfWeek).times(function() {
         daysOfWeek.push(daysOfWeek.shift());
       });
@@ -100,8 +143,6 @@
       }));
       var $table = $month.find('.dp-month-table')
       var $week = $(templates.week);
-
-      this.months.push([month, year]);
 
       // append empty cells before month's first day
       var firstDayDOW = $.fn.datepicker.daysOfWeek[date.getDay()];
@@ -131,15 +172,13 @@
 
       $week.appendTo($table);
       this.$el.append($month);
+
+      this.months.push({ month: month, year: year, $el: $month });
+
     },
-    destroy: function() {
-      this.$el.addClass('dp-hidden');
-      // quick & dirty hack - use timeout to avoid transitionend event
-      setTimeout(function(){
-        this.$el.remove();
-        delete this.$el;
-      }.bind(this), 200);
-    }
+    _getCell: function(date){
+      return this.$el.find('.dp-day[title="' + date.toDateString() + '"]');
+    },
   };
 
   $.fn.datepicker.Calendar = Calendar;
@@ -164,23 +203,36 @@
       value: date.toString(options.dateFormat) 
     })).insertAfter($input.hide());
 
-    this.$button.click(this.toggleCalendar.bind(this));
-
     this.calendar = new $.fn.datepicker.Calendar(_.extend({ date: this.date }, this.options));
+
+    this.$button.click(this.toggle.bind(this));
+    this.calendar.on('date:click', this.select.bind(this));
   }
 
   DatePicker.prototype = {
     isExpanded: function() {
       return this.$button.hasClass('dp-expanded');
     },
-    toggleCalendar: function() {
+    toggle: function() {
       if (this.isExpanded()) {
-        this.calendar.destroy();
+        this.calendar.remove();
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
         this.calendar.insertAfter(this.$button);
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
+    },
+    select: function(date){
+      date = new Date(date);
+      if(isNaN(date)) { throw new Error('Invalid date.'); }
+      this.date = date;
+      this.$button.html(date.toString(this.options.dateFormat));
+      this.calendar.select(date);
+    },
+    destroy: function() {
+      this.calendar.destroy();
+      this.$button.remove();
+      this.$input.data('datepicker', undefined).show();
     }
   }
 

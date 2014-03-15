@@ -16,23 +16,36 @@
       value: date.toString(options.dateFormat) 
     })).insertAfter($input.hide());
 
-    this.$button.click(this.toggleCalendar.bind(this));
-
     this.calendar = new $.fn.datepicker.Calendar(_.extend({ date: this.date }, this.options));
+
+    this.$button.click(this.toggle.bind(this));
+    this.calendar.on('date:click', this.select.bind(this));
   }
 
   DatePicker.prototype = {
     isExpanded: function() {
       return this.$button.hasClass('dp-expanded');
     },
-    toggleCalendar: function() {
+    toggle: function() {
       if (this.isExpanded()) {
-        this.calendar.destroy();
+        this.calendar.remove();
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
         this.calendar.insertAfter(this.$button);
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
+    },
+    select: function(date){
+      date = new Date(date);
+      if(isNaN(date)) { throw new Error('Invalid date.'); }
+      this.date = date;
+      this.$button.html(date.toString(this.options.dateFormat));
+      this.calendar.select(date);
+    },
+    destroy: function() {
+      this.calendar.destroy();
+      this.$button.remove();
+      this.$input.data('datepicker', undefined).show();
     }
   }
 
