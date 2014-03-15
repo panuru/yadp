@@ -5,18 +5,18 @@
     }
     options = _.defaults(options, $.fn.datepicker.defaults);
 
-    return this.each(function(){
-      var $this = $(this);
-      var dp = $this.data('datepicker');
+    var $this = this.first();
+    var dp = $this.data('datepicker');
+    var result = undefined;
 
-      if (!dp){
-        dp = new $.fn.datepicker.DatePicker($this, options);
-        $this.data('datepicker', dp);
-      }
-      if (method) {
-        dp[method].call(dp, options);
-      }
-    });
+    if (!dp){
+      dp = new $.fn.datepicker.DatePicker($this, options);
+      $this.data('datepicker', dp);
+    }
+    if (method) {
+      result = dp[method].call(dp, options);
+    }
+    return result == null ? $this : result;
   }
 
   $.fn.datepicker.defaults = { 

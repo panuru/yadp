@@ -19,7 +19,7 @@
     this.calendar = new $.fn.datepicker.Calendar(_.extend({ date: this.date }, this.options));
 
     this.$button.click(this.toggle.bind(this));
-    this.calendar.on('date:click', this.select.bind(this));
+    this.calendar.on('date:click', this.setDate.bind(this));
   }
 
   DatePicker.prototype = {
@@ -35,11 +35,15 @@
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
-    select: function(date){
+    getDate: function() {
+      return this.date;
+    },
+    setDate: function(date){
       date = new Date(date);
       if(isNaN(date)) { throw new Error('Invalid date.'); }
       this.date = date;
       this.$button.html(date.toString(this.options.dateFormat));
+      this.$input.val(date.toDateString());
       this.calendar.select(date);
     },
     destroy: function() {

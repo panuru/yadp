@@ -51,10 +51,10 @@
 
 /** Calendar **/
 /* line 52, stylesheets/datepicker.scss */
-.dp-calendar-container {
-  text-align: center;
-  color: #000;
-  cursor: default;
+.dp-calendar-container-outer {
+  position: relative;
+  width: 100%;
+  opacity: 1;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -66,14 +66,13 @@
   -moz-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
   transition-duration: 0.2s;
-  opacity: 1;
 }
-/* line 60, stylesheets/datepicker.scss */
-.dp-calendar-container.dp-hidden {
+/* line 59, stylesheets/datepicker.scss */
+.dp-calendar-container-outer.dp-hidden {
   opacity: 0;
 }
-/* line 63, stylesheets/datepicker.scss */
-.dp-calendar-container:before {
+/* line 62, stylesheets/datepicker.scss */
+.dp-calendar-container-outer:before {
   content: '';
   display: block;
   -webkit-box-shadow: inset 0 -8px 16px -16px rgba(0, 0, 0, 0.2);
@@ -82,8 +81,8 @@
   height: 8px;
   border-bottom: solid 1px #eee;
 }
-/* line 70, stylesheets/datepicker.scss */
-.dp-calendar-container:after {
+/* line 69, stylesheets/datepicker.scss */
+.dp-calendar-container-outer:after {
   content: '';
   display: block;
   -webkit-box-shadow: inset 0 16px 16px -16px rgba(0, 0, 0, 0.2);
@@ -93,14 +92,28 @@
   border-top: solid 1px #eee;
 }
 
-/* line 78, stylesheets/datepicker.scss */
+/* line 77, stylesheets/datepicker.scss */
+.dp-calendar-container-inner {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #000;
+  cursor: default;
+}
+
+/* line 84, stylesheets/datepicker.scss */
+.dp-calendar-backdrop {
+  height: 100%;
+}
+
+/* line 87, stylesheets/datepicker.scss */
 .dp-month-container {
   display: inline-block;
   margin: 4px 8px;
   font-size: 0.8em;
 }
 
-/* line 83, stylesheets/datepicker.scss */
+/* line 92, stylesheets/datepicker.scss */
 .dp-month-header {
   display: block;
   font-size: 1.0em;
@@ -109,31 +122,31 @@
   -webkit-box-shadow: inset 0 -4px 6px -6px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: inset 0 -4px 6px -6px rgba(0, 0, 0, 0.1);
   box-shadow: inset 0 -4px 6px -6px rgba(0, 0, 0, 0.1);
-  padding: 12px 0;
+  padding: 20px 0 12px 0;
   margin: 0;
 }
 
-/* line 92, stylesheets/datepicker.scss */
+/* line 101, stylesheets/datepicker.scss */
 .dp-month-table {
   padding-bottom: 14px;
 }
-/* line 94, stylesheets/datepicker.scss */
+/* line 103, stylesheets/datepicker.scss */
 .dp-month-table td, .dp-month-table th {
   padding: 7px 10px;
   border: solid 1px transparent;
 }
-/* line 98, stylesheets/datepicker.scss */
+/* line 107, stylesheets/datepicker.scss */
 .dp-month-table th {
   color: #ccc;
   font-weight: lighter;
   font-size: 0.9em;
 }
 
-/* line 104, stylesheets/datepicker.scss */
+/* line 113, stylesheets/datepicker.scss */
 .dp-day {
   cursor: pointer;
 }
-/* line 106, stylesheets/datepicker.scss */
+/* line 115, stylesheets/datepicker.scss */
 .dp-day.dp-selected {
   color: #003ae8;
   background-color: #d5e7fd;

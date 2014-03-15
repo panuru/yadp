@@ -49,14 +49,13 @@ $accent-border-color: #D0E4FC;
   content: "\e114";
 }
 /** Calendar **/
-.dp-calendar-container {
-  text-align: center;
-  color: #000;
-  cursor: default;
+.dp-calendar-container-outer {
+  position: relative;
+  width: 100%;
+  opacity: 1;
   @include user-select(none);
   @include transition-property(opacity);
   @include transition-duration(0.2s);
-  opacity: 1;
   &.dp-hidden {
     opacity: 0;
   }
@@ -75,6 +74,16 @@ $accent-border-color: #D0E4FC;
     border-top: solid 1px #eee;
   }
 }
+.dp-calendar-container-inner {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #000;
+  cursor: default;
+}
+.dp-calendar-backdrop {
+  height: 100%;
+}
 .dp-month-container {
   display: inline-block;
   margin: 4px 8px;
@@ -86,7 +95,7 @@ $accent-border-color: #D0E4FC;
   font-weight: bold;
   border-bottom: solid 1px #ddd;
   @include box-shadow(inset 0 -4px 6px -6px rgba(0,0,0,0.1));
-  padding: 12px 0;
+  padding: 20px 0 12px 0;
   margin: 0;
 }
 .dp-month-table {

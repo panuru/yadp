@@ -5,18 +5,18 @@
     }
     options = _.defaults(options, $.fn.datepicker.defaults);
 
-    return this.each(function(){
-      var $this = $(this);
-      var dp = $this.data('datepicker');
+    var $this = this.first();
+    var dp = $this.data('datepicker');
+    var result = undefined;
 
-      if (!dp){
-        dp = new $.fn.datepicker.DatePicker($this, options);
-        $this.data('datepicker', dp);
-      }
-      if (method) {
-        dp[method].call(dp, options);
-      }
-    });
+    if (!dp){
+      dp = new $.fn.datepicker.DatePicker($this, options);
+      $this.data('datepicker', dp);
+    }
+    if (method) {
+      result = dp[method].call(dp, options);
+    }
+    return result == null ? $this : result;
   }
 
   $.fn.datepicker.defaults = { 
@@ -34,7 +34,11 @@
 
     button: _.template('<span class="dp-control dp-collapsed"><%= value %></span>'),
 
-    calendarContainer: '<div class="dp-calendar-container dp-hidden"></div>',
+    calendarContainer: 
+      '<div class="dp-calendar-container-outer dp-hidden">' + 
+      '  <div class="dp-calendar-container-inner"></div>' +
+      '  <div class="dp-calendar-backdrop"></div>' +
+      '</div>',
 
     month: _.template(
       '<div class="dp-month-container">' + 
@@ -53,7 +57,7 @@
       '<td class="dp-day <% if(selected) { print("dp-selected"); } %>" title="<%= title %>"><%= day %></td>'
     ),
 
-    emptyCell: '<td class="dp-day dp-empty"></td>'
+    emptyCell: '<td class="dp-empty"></td>'
 
   }
 
@@ -86,12 +90,15 @@
       setTimeout(function(){
         this.$el.removeClass('dp-hidden');
       }.bind(this), 0);
+      // adjust height to absolute positioned child
+      this.$el.height(this.$el.find('.dp-calendar-container-inner').height());
     },
     render: function(){
       var month = this.date.getMonth();
       var year = this.date.getFullYear();
       
       this.$el = $(templates.calendarContainer);
+      this.$el.find('.dp-calendar-container-inner').pep({ axis: 'x' });
 
       this.$el.click(function(ev) {
         $target = $(ev.target);
@@ -117,10 +124,6 @@
         this.$el.remove();
         delete this.$el;
       }.bind(this), 200);
-    },
-    removeMonth: function(month) {
-      month.$el.remove();
-      _.pull(this.months, month);
     },
     destroy: function() {
       this.remove();
@@ -171,10 +174,14 @@
       });
 
       $week.appendTo($table);
-      this.$el.append($month);
+      this.$el.find('.dp-calendar-container-inner').append($month);
 
       this.months.push({ month: month, year: year, $el: $month });
 
+    },
+    _removeMonth: function(month) {
+      month.$el.remove();
+      _.pull(this.months, month);
     },
     _getCell: function(date){
       return this.$el.find('.dp-day[title="' + date.toDateString() + '"]');
@@ -206,7 +213,7 @@
     this.calendar = new $.fn.datepicker.Calendar(_.extend({ date: this.date }, this.options));
 
     this.$button.click(this.toggle.bind(this));
-    this.calendar.on('date:click', this.select.bind(this));
+    this.calendar.on('date:click', this.setDate.bind(this));
   }
 
   DatePicker.prototype = {
@@ -222,11 +229,15 @@
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
-    select: function(date){
+    getDate: function() {
+      return this.date;
+    },
+    setDate: function(date){
       date = new Date(date);
       if(isNaN(date)) { throw new Error('Invalid date.'); }
       this.date = date;
       this.$button.html(date.toString(this.options.dateFormat));
+      this.$input.val(date.toDateString());
       this.calendar.select(date);
     },
     destroy: function() {
