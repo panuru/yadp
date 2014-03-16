@@ -49,16 +49,19 @@ $accent-border-color: #D0E4FC;
   content: "\e114";
 }
 /** Calendar **/
-.dp-calendar-container-outer {
-  position: relative;
-  width: 100%;
+.dp-fade {
   opacity: 1;
-  @include user-select(none);
   @include transition-property(opacity);
-  @include transition-duration(0.2s);
+  @include transition-duration(0.4s);
   &.dp-hidden {
     opacity: 0;
   }
+}
+.dp-calendar-container-outer {
+  position: relative;
+  width: 100%;
+  @include user-select(none);
+  
   &:before {
     content: '';
     display: block;

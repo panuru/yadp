@@ -38,13 +38,13 @@
     button: _.template('<span class="dp-control dp-collapsed"><%= value %></span>'),
 
     calendarContainer: 
-      '<div class="dp-calendar-container-outer dp-hidden">' + 
+      '<div class="dp-calendar-container-outer dp-fade dp-hidden">' + 
       '  <div class="dp-calendar-container-inner"></div>' +
       '  <div class="dp-calendar-backdrop"></div>' +
       '</div>',
 
     month: _.template(
-      '<div class="dp-month-container">' + 
+      '<div class="dp-month-container dp-fade dp-hidden">' + 
       '  <h3 class="dp-month-header"><%= month %>, <%= year %></h3>' + 
       '  <table class="dp-month-table">' + 
       '    <tr class="dp-days-of-week">' + 
@@ -74,7 +74,6 @@
   function Calendar(options) {
     this.options = options;
     this.date = new Date(options.date);
-    this.months = [];
     this._callbacks = {};
   }
 
@@ -85,23 +84,22 @@
 
       // render previous month first
       var month = new Date(this.date).moveToFirstDayOfMonth().addMonths(-1);
+      this._firstMonth = new Date(month);
       var $month = this._renderMonth({ month: month }); 
 
       // when the first month is in DOM, get its width and calculate total
-      // amount of months per page
+      // amount of months visible
       this._monthWidth = $month.outerWidth();
       this._containerWidth = this.$el.width();
       var monthsCount = Math.ceil(this._containerWidth / this._monthWidth);
       _(monthsCount - 1).times(function() {
         this._renderMonth({ month: month.addMonths(1) });
       }.bind(this));
+      this._lastMonth = new Date(month);
 
       this._bindEvents();
-      
-      // hack to make css transition work
-      setTimeout(function (){
-        this.$el.removeClass('dp-hidden');
-      }.bind(this), 0);
+
+      fadeIn(this.$el);
     },
     select: function(date) {
       this._getCell(this.date).removeClass('dp-selected');
@@ -109,13 +107,10 @@
       this.date = date;
     },
     remove: function() {
-      this.months = [];
-      this.$el.addClass('dp-hidden');
-      // quick & dirty hack - use timeout to avoid transitionend event
-      setTimeout(function(){
+      fadeOut(this.$el, function(){
         this.$el.remove();
         delete this.$el;
-      }.bind(this), 200);
+      }.bind(this));
     },
     destroy: function() {
       this.remove();
@@ -136,29 +131,11 @@
       cb.add(callback);
     },
     _bindEvents: function(){
-      this.$el.find('.dp-calendar-container-inner').pep({ 
+      this.$innerContainer.pep({ 
         axis: 'x',
         useCSSTranslation: false,
-        stop: function(ev) {
-          var left = this.$innerContainer.position().left;
-          var monthsCount, month;
-          if(left > 0) {
-            monthsCount = Math.ceil(left / this._monthWidth);
-            month = new Date(this.months[0].date);
-            this.$innerContainer.css({ left: left - this._monthWidth * monthsCount });
-            _(monthsCount).times(function() {
-              this._renderMonth({ month: month.addMonths(-1), prepend: true });
-            }.bind(this));
-          } 
-          else {
-            var right = this.$el.width() - (left + this.$innerContainer.width());
-            monthsCount = Math.ceil(right / this._monthWidth);
-            month = new Date(this.months[this.months.length - 1].date);
-            _(monthsCount).times(function() {
-              this._renderMonth({ month: month.addMonths(1) });
-            }.bind(this));
-          }
-        }.bind(this)
+        drag: _.throttle(this._addMoreMonths.bind(this), 200),
+        rest: this._addMoreMonths.bind(this)
       });
 
       this.$el.click(function(ev) {
@@ -210,23 +187,60 @@
       });
 
       $week.appendTo($table);
+
       if(options.prepend) {
         $month.prependTo(this.$innerContainer);
-        this.months.unshift({ date: new Date(options.month), $el: $month });
       } else {
         $month.appendTo(this.$innerContainer);
-        this.months.push({ date: new Date(options.month), $el: $month });
       }
-      // adjust calendar height to absolute positioned child
+      fadeIn($month);
+
+      // adjust calendar height to absolute positioned inner container
       this.$el.height(this.$innerContainer.height());
 
-
       return $month;
+    },
+    _addMoreMonths: function() {
+      var left = this.$innerContainer.position().left;
+      var monthsCount, month;
+      if(left > 0) {
+        monthsCount = Math.ceil(left / this._monthWidth);
+
+        // $.pep adds css transition to 'left' property, here is a workaround
+        var transition = this.$innerContainer.css('transition');
+        this.$innerContainer.css({ 'transition': 'none', 'webkit-transition': 'none' });
+        this.$innerContainer.css({ left: left - this._monthWidth * monthsCount });
+        
+        _(monthsCount).times(function() {
+          this._renderMonth({ month: this._firstMonth.addMonths(-1), prepend: true });
+        }.bind(this));
+
+        this.$innerContainer.css({ 'transition': transition, 'webkit-transition': transition });
+      } 
+      else {
+        var right = this.$el.width() - (left + this.$innerContainer.width());
+        if(right > 0) {
+          monthsCount = Math.ceil(right / this._monthWidth);
+          _(monthsCount).times(function() {
+            this._renderMonth({ month: this._lastMonth.addMonths(1) });
+          }.bind(this));
+        }
+      }
     },
     _getCell: function(date){
       return this.$el.find('.dp-day[title="' + date.toDateString() + '"]');
     },
   };
+
+  // css transition hacks
+  function fadeIn($el, callback) {
+    setTimeout(function (){
+      $el.removeClass('dp-hidden').one('transitionend oTransitionEnd webkitTransitionEnd', callback);
+    }, 0);
+  }
+  function fadeOut($el, callback) {
+    $el.addClass('dp-hidden').one('transitionend oTransitionEnd webkitTransitionEnd', callback);
+  }
 
   $.fn.datepicker.Calendar = Calendar;
 
