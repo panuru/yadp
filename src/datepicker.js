@@ -1,4 +1,6 @@
 ;(function($){
+  "use strict";
+
   $.fn.datepicker = function(method, options) {
     if (_.isObject(method)) { 
       options = method; method = undefined;
@@ -7,7 +9,7 @@
 
     var $this = this.first();
     var dp = $this.data('datepicker');
-    var result = undefined;
+    var result;
 
     if (!dp){
       dp = new $.fn.datepicker.DatePicker($this, options);
@@ -17,7 +19,7 @@
       result = dp[method].call(dp, options);
     }
     return result == null ? $this : result;
-  }
+  };
 
   $.fn.datepicker.defaults = { 
     dateFormat: 'd MMM \'yy',
@@ -29,6 +31,7 @@
 })(jQuery);
 ;
 (function($){
+  "use strict";
 
   $.fn.datepicker.templates = {
 
@@ -59,38 +62,28 @@
 
     emptyCell: '<td class="dp-empty"></td>'
 
-  }
+  };
 
 })(jQuery);
 ;
 (function($){
+  "use strict";
+
   var templates = $.fn.datepicker.templates;
 
   function Calendar(options) {
     this.options = options;
-    this.date = options.date;
+    this.date = new Date(options.date);
     this.months = [];
     this._callbacks = {};
   }
 
   Calendar.prototype = {
-    trigger: function(event, data) {
-      var cb = this._callbacks[event];
-      if(cb) { cb.fire(data); }
-    },
-    on: function(event, callback) {
-      var cb = this._callbacks[event];
-      if(!cb) { 
-        cb = this._callbacks[event] = $.Callbacks(); 
-      }
-      cb.add(callback);
-    },
-    insertAfter: function($element){
-      this.$el = $(templates.calendarContainer);
+    render: function(options){
+      this.$el = $(templates.calendarContainer).insertAfter(options.after);
       // render previous month first
       var month = new Date(this.date).moveToFirstDayOfMonth().addMonths(-1);
       this._renderMonth(month); 
-      this.$el.insertAfter($element);
       
       // hack to make css transition work
       setTimeout(function(){
@@ -99,7 +92,7 @@
         // when the first month is in DOM, get its width and calculate total
         // amount of months per page
         var monthWidth = this.$el.find('.dp-month-container').outerWidth();
-        var containerWidth = this.$el.width()
+        var containerWidth = this.$el.width();
         this._monthsPerPage = Math.floor(containerWidth / monthWidth);
         _(this._monthsPerPage - 1).times(function() {
           this._renderMonth(month.addMonths(1));
@@ -111,12 +104,11 @@
         this._bindEvents();
 
       }.bind(this), 0);
-
     },
     select: function(date) {
       this._getCell(this.date).removeClass('dp-selected');
+      this._getCell(date).addClass('dp-selected');
       this.date = date;
-      this._getCell(this.date).addClass('dp-selected');
     },
     remove: function() {
       this.months = [];
@@ -134,11 +126,22 @@
       });
       this._callbacks = {};
     },
+    trigger: function(event, data) {
+      var cb = this._callbacks[event];
+      if(cb) { cb.fire(data); }
+    },
+    on: function(event, callback) {
+      var cb = this._callbacks[event];
+      if(!cb) { 
+        cb = this._callbacks[event] = $.Callbacks(); 
+      }
+      cb.add(callback);
+    },
     _bindEvents: function(){
       this.$el.find('.dp-calendar-container-inner').pep({ axis: 'x' });
 
       this.$el.click(function(ev) {
-        $target = $(ev.target);
+        var $target = $(ev.target);
         if($target.hasClass('dp-day')) {
           this.trigger('date:click', new Date($target.attr('title')));
         }
@@ -156,7 +159,7 @@
         year: date.getFullYear(),
         daysOfWeek: daysOfWeek
       }));
-      var $table = $month.find('.dp-month-table')
+      var $table = $month.find('.dp-month-table');
       var $week = $(templates.week);
 
       // append empty cells before month's first day
@@ -205,6 +208,8 @@
 })(jQuery);
 ;
 (function($){
+  "use strict";
+
   var templates = $.fn.datepicker.templates;
 
   function DatePicker($input, options) {
@@ -237,7 +242,7 @@
         this.calendar.remove();
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
-        this.calendar.insertAfter(this.$button);
+        this.calendar.render({ after: this.$button });
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
@@ -246,7 +251,9 @@
     },
     setDate: function(date){
       date = new Date(date);
-      if(isNaN(date)) { throw new Error('Invalid date.'); }
+      if(isNaN(date)) { 
+        throw new Error('Invalid date.'); 
+      }
       this.date = date;
       this.$button.html(date.toString(this.options.dateFormat));
       this.$input.val(date.toDateString());
@@ -257,7 +264,7 @@
       this.$button.remove();
       this.$input.data('datepicker', undefined).show();
     }
-  }
+  };
 
   $.fn.datepicker.DatePicker = DatePicker;
 

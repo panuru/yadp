@@ -1,4 +1,5 @@
 (function($){
+  "use strict";
 
   $.fn.datepicker.templates = {
 
@@ -29,6 +30,6 @@
 
     emptyCell: '<td class="dp-empty"></td>'
 
-  }
+  };
 
 })(jQuery);

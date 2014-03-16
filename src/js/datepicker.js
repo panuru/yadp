@@ -1,4 +1,6 @@
 (function($){
+  "use strict";
+
   var templates = $.fn.datepicker.templates;
 
   function DatePicker($input, options) {
@@ -31,7 +33,7 @@
         this.calendar.remove();
         this.$button.removeClass('dp-expanded').addClass('dp-collapsed');
       } else {
-        this.calendar.insertAfter(this.$button);
+        this.calendar.render({ after: this.$button });
         this.$button.removeClass('dp-collapsed').addClass('dp-expanded');
       }
     },
@@ -40,7 +42,9 @@
     },
     setDate: function(date){
       date = new Date(date);
-      if(isNaN(date)) { throw new Error('Invalid date.'); }
+      if(isNaN(date)) { 
+        throw new Error('Invalid date.'); 
+      }
       this.date = date;
       this.$button.html(date.toString(this.options.dateFormat));
       this.$input.val(date.toDateString());
@@ -51,7 +55,7 @@
       this.$button.remove();
       this.$input.data('datepicker', undefined).show();
     }
-  }
+  };
 
   $.fn.datepicker.DatePicker = DatePicker;
 

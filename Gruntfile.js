@@ -2,6 +2,18 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    jshint: {
+      options: {
+        curly: true,
+        eqeqeq: true,
+        eqnull: true,
+        browser: true,
+        globals: {
+          jQuery: true
+        },
+      },
+      uses_defaults: ['Gruntfile.js', 'src/js/*']
+    },
     concat: {
       options: {
         separator: ';\n'
@@ -22,7 +34,7 @@ module.exports = function(grunt) {
     watch: {
       js: {
         files: ['src/js/*'],
-        tasks: ['concat']
+        tasks: ['jshint', 'concat']
       },
       stylesheets: {
         files: ['src/stylesheets/*'],
@@ -31,10 +43,11 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-compass');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('default', ['concat', 'compass', 'watch']);
+  grunt.registerTask('default', ['jshint', 'concat', 'compass', 'watch']);
 
 };

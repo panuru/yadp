@@ -1,4 +1,6 @@
 ;(function($){
+  "use strict";
+
   $.fn.datepicker = function(method, options) {
     if (_.isObject(method)) { 
       options = method; method = undefined;
@@ -7,7 +9,7 @@
 
     var $this = this.first();
     var dp = $this.data('datepicker');
-    var result = undefined;
+    var result;
 
     if (!dp){
       dp = new $.fn.datepicker.DatePicker($this, options);
@@ -17,7 +19,7 @@
       result = dp[method].call(dp, options);
     }
     return result == null ? $this : result;
-  }
+  };
 
   $.fn.datepicker.defaults = { 
     dateFormat: 'd MMM \'yy',
