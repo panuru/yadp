@@ -76,7 +76,8 @@ $accent-border-color: #D0E4FC;
 }
 .dp-calendar-container-inner {
   position: absolute;
-  width: 100%;
+  width: auto;
+  min-width: 100%;
   text-align: center;
   color: #000;
   cursor: default;

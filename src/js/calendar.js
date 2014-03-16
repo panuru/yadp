@@ -17,15 +17,15 @@
 
       // render previous month first
       var month = new Date(this.date).moveToFirstDayOfMonth().addMonths(-1);
-      var $month = this._renderMonth(month); 
+      var $month = this._renderMonth({ month: month }); 
 
       // when the first month is in DOM, get its width and calculate total
       // amount of months per page
-      var monthWidth = $month.outerWidth();
-      var containerWidth = this.$el.width();
-      this._monthsPerPage = Math.floor(containerWidth / monthWidth);
-      _(this._monthsPerPage - 1).times(function() {
-        this._renderMonth(month.addMonths(1));
+      this._monthWidth = $month.outerWidth();
+      this._containerWidth = this.$el.width();
+      var monthsCount = Math.ceil(this._containerWidth / this._monthWidth);
+      _(monthsCount - 1).times(function() {
+        this._renderMonth({ month: month.addMonths(1) });
       }.bind(this));
 
       this._bindEvents();
@@ -68,7 +68,30 @@
       cb.add(callback);
     },
     _bindEvents: function(){
-      this.$el.find('.dp-calendar-container-inner').pep({ axis: 'x' });
+      this.$el.find('.dp-calendar-container-inner').pep({ 
+        axis: 'x',
+        useCSSTranslation: false,
+        stop: function(ev) {
+          var left = this.$innerContainer.position().left;
+          var monthsCount, month;
+          if(left > 0) {
+            monthsCount = Math.ceil(left / this._monthWidth);
+            month = new Date(this.months[0].date);
+            this.$innerContainer.css({ left: left - this._monthWidth * monthsCount });
+            _(monthsCount).times(function() {
+              this._renderMonth({ month: month.addMonths(-1), prepend: true });
+            }.bind(this));
+          } 
+          else {
+            var right = this.$el.width() - (left + this.$innerContainer.width());
+            monthsCount = Math.ceil(right / this._monthWidth);
+            month = new Date(this.months[this.months.length - 1].date);
+            _(monthsCount).times(function() {
+              this._renderMonth({ month: month.addMonths(1) });
+            }.bind(this));
+          }
+        }.bind(this)
+      });
 
       this.$el.click(function(ev) {
         var $target = $(ev.target);
@@ -77,8 +100,8 @@
         }
       }.bind(this));
     },
-    _renderMonth: function(monthDate) {
-      var date = new Date(monthDate);
+    _renderMonth: function(options) {
+      var date = new Date(options.month);
       var daysOfWeek = _.clone($.fn.datepicker.daysOfWeek);
       // rearrange days of week according to the first day of week setting
       _(this.options.firstDayOfWeek).times(function() {
@@ -98,7 +121,7 @@
         $week.append(templates.emptyCell);
       });
 
-      while(date.getMonth() === monthDate.getMonth()) {
+      while(date.getMonth() === options.month.getMonth()) {
         var day = date.getDate();
         if(date.getDay() === this.options.firstDayOfWeek && day !== 1) {
           $week.appendTo($table);
@@ -119,18 +142,18 @@
       });
 
       $week.appendTo($table);
-      this.$innerContainer.append($month);
-
-      this.months.push({ month: monthDate, $el: $month });
-
+      if(options.prepend) {
+        $month.prependTo(this.$innerContainer);
+        this.months.unshift({ date: new Date(options.month), $el: $month });
+      } else {
+        $month.appendTo(this.$innerContainer);
+        this.months.push({ date: new Date(options.month), $el: $month });
+      }
       // adjust calendar height to absolute positioned child
       this.$el.height(this.$innerContainer.height());
 
+
       return $month;
-    },
-    _removeMonth: function(month) {
-      month.$el.remove();
-      _.pull(this.months, month);
     },
     _getCell: function(date){
       return this.$el.find('.dp-day[title="' + date.toDateString() + '"]');
