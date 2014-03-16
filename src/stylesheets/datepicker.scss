@@ -80,13 +80,16 @@ $accent-border-color: #D0E4FC;
   text-align: center;
   color: #000;
   cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: top;
 }
 .dp-calendar-backdrop {
   height: 100%;
 }
 .dp-month-container {
   display: inline-block;
-  margin: 4px 8px;
+  padding: 4px 8px;
   font-size: 0.8em;
 }
 .dp-month-header {

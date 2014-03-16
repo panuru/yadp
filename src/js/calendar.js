@@ -15,36 +15,38 @@
     },
     on: function(event, callback) {
       var cb = this._callbacks[event];
-      if(!cb) { cb = this._callbacks[event] = $.Callbacks()}
+      if(!cb) { 
+        cb = this._callbacks[event] = $.Callbacks(); 
+      }
       cb.add(callback);
     },
     insertAfter: function($element){
-      if(!this.$el) { this.render(); }
+      this.$el = $(templates.calendarContainer);
+      // render previous month first
+      var month = new Date(this.date).moveToFirstDayOfMonth().addMonths(-1);
+      this._renderMonth(month); 
       this.$el.insertAfter($element);
+      
       // hack to make css transition work
       setTimeout(function(){
         this.$el.removeClass('dp-hidden');
-      }.bind(this), 0);
-      // adjust height to absolute positioned child
-      this.$el.height(this.$el.find('.dp-calendar-container-inner').height());
-    },
-    render: function(){
-      var month = this.date.getMonth();
-      var year = this.date.getFullYear();
-      
-      this.$el = $(templates.calendarContainer);
-      this.$el.find('.dp-calendar-container-inner').pep({ axis: 'x' });
 
-      this.$el.click(function(ev) {
-        $target = $(ev.target);
-        if($target.hasClass('dp-day')) {
-          this.trigger('date:click', new Date($target.attr('title')));
-        }
-      }.bind(this));
-      
-      for(var i = -1; i <= 1; i++) {
-        this._renderMonth(month + i, year);
-      }
+        // when the first month is in DOM, get its width and calculate total
+        // amount of months per page
+        var monthWidth = this.$el.find('.dp-month-container').outerWidth();
+        var containerWidth = this.$el.width()
+        this._monthsPerPage = Math.floor(containerWidth / monthWidth);
+        _(this._monthsPerPage - 1).times(function() {
+          this._renderMonth(month.addMonths(1));
+        }.bind(this));
+
+        // adjust height to absolute positioned child
+        this.$el.height(this.$el.find('.dp-calendar-container-inner').height());
+
+        this._bindEvents();
+
+      }.bind(this), 0);
+
     },
     select: function(date) {
       this._getCell(this.date).removeClass('dp-selected');
@@ -67,8 +69,18 @@
       });
       this._callbacks = {};
     },
-    _renderMonth: function(month, year) {
-      var date = new Date(year, month, 1);
+    _bindEvents: function(){
+      this.$el.find('.dp-calendar-container-inner').pep({ axis: 'x' });
+
+      this.$el.click(function(ev) {
+        $target = $(ev.target);
+        if($target.hasClass('dp-day')) {
+          this.trigger('date:click', new Date($target.attr('title')));
+        }
+      }.bind(this));
+    },
+    _renderMonth: function(monthDate) {
+      var date = new Date(monthDate);
       var daysOfWeek = _.clone($.fn.datepicker.daysOfWeek);
       // rearrange days of week according to the first day of week setting
       _(this.options.firstDayOfWeek).times(function() {
@@ -76,7 +88,7 @@
       });
       var $month = $(templates.month({ 
         month: date.toString('MMMM'), 
-        year: year,
+        year: date.getFullYear(),
         daysOfWeek: daysOfWeek
       }));
       var $table = $month.find('.dp-month-table')
@@ -88,7 +100,7 @@
         $week.append(templates.emptyCell);
       });
 
-      while(date.getMonth() === month) {
+      while(date.getMonth() === monthDate.getMonth()) {
         var day = date.getDate();
         if(date.getDay() === this.options.firstDayOfWeek && day !== 1) {
           $week.appendTo($table);
@@ -111,7 +123,7 @@
       $week.appendTo($table);
       this.$el.find('.dp-calendar-container-inner').append($month);
 
-      this.months.push({ month: month, year: year, $el: $month });
+      this.months.push({ month: monthDate, $el: $month });
 
     },
     _removeMonth: function(month) {
