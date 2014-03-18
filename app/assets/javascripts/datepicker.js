@@ -1,7 +1,3 @@
-//= require jquery
-//= require lodash
-//= require date
-//= require jquery_datepicker
 //= require templates
 //= require calendar
 (function($){

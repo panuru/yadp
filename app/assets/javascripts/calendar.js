@@ -1,9 +1,6 @@
-//= require jquery
-//= require jquery_pep
-//= require lodash
-//= require date
-//= require jquery_datepicker
+//= require jquery.datepicker
 //= require templates
+//= require jquery.pep
 (function($){
   "use strict";
 

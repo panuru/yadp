@@ -1,7 +1,4 @@
-//= require jquery
-//= require lodash
-//= require date
-//= require jquery_datepicker
+//= require jquery.datepicker
 (function($){
   "use strict";
 
