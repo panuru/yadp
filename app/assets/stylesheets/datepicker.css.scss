@@ -1,0 +1,126 @@
+$accent-color: #003AE8;
+$accent-background: #D5E7FD;
+$accent-border-color-active: #A5CBFB;
+$accent-border-color: #D0E4FC;
+
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('../fonts/glyphicons-halflings-regular.eot');
+  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), 
+       url('../fonts/glyphicons-halflings-regular.woff') format('woff'), 
+       url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), 
+       url('../fonts/glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
+}
+/** Button **/
+.dp-control {
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0 3px;
+  padding: 4px;
+  font-size: 0.8em;
+  color: $accent-color;
+  background-color: $accent-background;
+  border: solid 1px $accent-border-color;
+  cursor: pointer;
+  &.dp-expanded {
+    border: solid 1px $accent-border-color-active;
+  }
+}
+.dp-control:before {
+  font-family: 'Glyphicons Halflings';
+  content: "\e109";
+  position: relative;
+  font-size: 0.9em;
+  top: 0.1em;
+  padding: 0 4px;
+}
+.dp-control:after {
+  font-family: 'Glyphicons Halflings';
+  font-size: 0.6em;
+  padding: 0 6px;
+}
+.dp-expanded:after {
+  content: "\e113";
+}
+.dp-collapsed:after {
+  content: "\e114";
+}
+/** Calendar **/
+.dp-fade {
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 0.4s;
+  &.dp-hidden {
+    opacity: 0;
+  }
+}
+.dp-calendar-container-outer {
+  position: relative;
+  width: 100%;
+  user-select: none;
+  
+  &:before {
+    content: '';
+    display: block;
+    box-shadow: inset 0 -8px 16px -16px rgba(0,0,0,0.2);
+    height: 8px;
+    border-bottom: solid 1px #eee;
+  }
+  &:after {
+    content: '';
+    display: block;
+    box-shadow: inset 0 16px 16px -16px rgba(0,0,0,0.2);
+    height: 16px;
+    border-top: solid 1px #eee;
+  }
+}
+.dp-calendar-container-inner {
+  position: absolute;
+  width: auto;
+  min-width: 100%;
+  text-align: center;
+  color: #000;
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.dp-calendar-backdrop {
+  height: 100%;
+}
+.dp-month-container {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+.dp-month-header {
+  display: block;
+  font-size: 1.0em;
+  font-weight: bold;
+  border-bottom: solid 1px #ddd;
+  box-shadow: inset 0 -4px 6px -6px rgba(0,0,0,0.1);
+  padding: 20px 0 12px 0;
+  margin: 0;
+}
+.dp-month-table {
+  padding-bottom: 14px;
+  td, th {
+    padding: 7px 10px;
+    border: solid 1px transparent;
+  }
+  th {
+    color: #ccc;
+    font-weight: lighter;
+    font-size: 0.9em;
+  }
+}
+.dp-day {
+  cursor: pointer;
+  &.dp-selected{
+    color: $accent-color;
+    background-color: $accent-background;
+    border: solid 1px $accent-border-color;
+    transition-property: all;
+    transition-duration: 0.6s;
+  }
+}
