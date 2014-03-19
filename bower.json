@@ -1,0 +1,32 @@
+{
+  "name": "yadp",
+  "version": "0.0.1",
+  "homepage": "https://github.com/panuru/yadp",
+  "authors": [
+    "panuru <iseesomuch@gmail.com>"
+  ],
+  "description": "yet another date picker",
+  "main": "src/datepicker.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "datepicker"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "Gruntfile.js",
+    "demo",
+    "src/js",
+    "src/stylesheets"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.0",
+    "jquery.pep": "~0.5.12",
+    "lodash": "~2.4.1"
+  }
+}

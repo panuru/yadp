@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/jquery.pep.js"></script>
+    <script type="text/javascript" src="js/date.js"></script>
+    <script type="text/javascript" src="js/lodash.js"></script>
+    <script type="text/javascript" src="js/datepicker.js"></script>
+    <link rel="stylesheet" href="css/datepicker.css" type="text/css">
+    <style type="text/css">
+    body {
+      font-family: 'Lucida Sans Unicode', sans-serif;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Example</h1>
+    <section class="container">
+      <label for="datepicker">Choose date:</label>
+      <input type="text" disabled id="datepicker" value="2013-11-16">
+    </section>
+    <script type="text/javascript">
+      $(function() {
+        $('#datepicker').datepicker();
+      });
+    </script>
+  </body>
+</html>
